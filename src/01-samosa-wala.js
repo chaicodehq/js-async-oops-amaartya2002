@@ -75,12 +75,89 @@
  */
 export function createSamosaCart(ownerName, location) {
   // Your code here
+
+  const samosaCart =
+  {
+    owner: ownerName,
+    location: location,
+    menu: {
+      samosa: 15,
+      jalebi: 20,
+      kachori: 25
+    },
+    sales: [],
+
+    sellItem(itemName, quantity) {
+      if (!this.menu.hasOwnProperty(itemName) || quantity <= 0) {
+        return -1
+      }
+      const total = this.menu[itemName] * quantity
+      const soldItem = {
+        item: itemName,
+        quantity,
+        total
+      }
+      this.sales.push(soldItem)
+      return total
+    },
+
+    getDailySales() {
+
+      if (this.sales.length === 0) return 0
+      const totalSalesAmount = this.sales.reduce((acc, curr) => {
+        return acc + curr["total"]
+      }, 0)
+      return totalSalesAmount
+    },
+
+    getPopularItem() {
+
+      if (this.sales.length === 0) return null
+
+      const res = this.sales.reduce((acc, sale) => {
+
+        acc.counts[sale.item] = (acc.counts[sale.item] || 0) + sale.quantity
+
+        if (acc.counts[sale.item] > acc.maxQuantity) {
+          acc.maxQuantity = acc.counts[sale.item]
+          acc.getPopularItem = sale.item
+        }
+
+        return acc
+
+
+      }, { counts: {}, maxQuantity: 0, getPopularItem: null })
+
+      return res.getPopularItem
+    },
+
+    moveTo(newLocation) {
+      this.location = newLocation
+      return `${this.owner} ka cart ab ${newLocation} pe hai!`
+    },
+
+    resetDay() {
+      this.sales = []
+      return `${this.owner} ka naya din shuru!`
+    },
+
+
+  }
+
+  return samosaCart
 }
 
 export function demonstrateThisLoss(cart) {
   // Your code here
+
+  const sellFun = cart.sellItem
+  return sellFun
+
 }
 
 export function fixWithBind(cart) {
   // Your code here
+
+  const sellFun = cart.sellItem.bind(cart)
+  return sellFun
 }
